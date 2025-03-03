@@ -3,7 +3,7 @@ import RPi.GPIO as GPIO
 import numpy as np
 import cv2
 from picamera2 import Picamera2
-import tflite_runtime.interpreter as tflite  # Use TFLite runtime for efficiency
+import tflite_runtime.interpreter as tflite
 
 # GPIO Pin Setup
 TRIG = 23  # Ultrasonic Trigger Pin
@@ -14,12 +14,15 @@ ENA_PIN = 22
 
 # GPIO Setup
 GPIO.setmode(GPIO.BCM)
-GPIO.setwarnings(False)  # Avoid "channel already in use" warnings
+GPIO.setwarnings(False)
 GPIO.setup(TRIG, GPIO.OUT)
 GPIO.setup(ECHO, GPIO.IN)
 GPIO.setup(STEP_PIN, GPIO.OUT)
 GPIO.setup(DIR_PIN, GPIO.OUT)
 GPIO.setup(ENA_PIN, GPIO.OUT)
+
+# Enable the stepper motor (HIGH = On)
+GPIO.output(ENA_PIN, GPIO.HIGH)
 
 # Load TFLite Model
 interpreter = tflite.Interpreter(model_path="model.tflite")
@@ -31,7 +34,7 @@ output_details = interpreter.get_output_details()
 
 # Picamera2 setup
 picam2 = Picamera2()
-picam2.configure(picam2.create_still_configuration(main={"size": (224, 224)}))  # Ensure model-compatible size
+picam2.configure(picam2.create_still_configuration(main={"size": (224, 224)}))  # model-compatible size
 picam2.start()
 
 def get_distance():
@@ -53,11 +56,17 @@ def get_distance():
 
 def capture_image():
     """Captures an image and converts it to UINT8 for the TFLite model."""
-    picam2.capture_file("image.jpg")  # Save image (optional)
-    img = cv2.imread("image.jpg")  # Read image
+    picam2.capture_file("image_large.jpg")  # Save image 
+    img = cv2.imread("image_large.jpg")  # Read image
     img = cv2.resize(img, (224, 224))  # Resize for model
     img = img.astype(np.uint8)  # Convert to UINT8 (expected by model)
     img = np.expand_dims(img, axis=0)  # Add batch dimension
+
+    # Save the captured image without displaying it
+    filename = "image_large.jpg"
+    cv2.imwrite(filename, img[0])
+    print(f"Image saved as {filename}")
+
     return img
 
 def classify_image(image):
@@ -67,6 +76,15 @@ def classify_image(image):
     output_data = interpreter.get_tensor(output_details[0]['index'])
     predicted_class = np.argmax(output_data)
     return predicted_class
+
+def rotate_stepper_motor(steps, direction=GPIO.HIGH):
+    """Rotates the stepper motor by a specified number of steps."""
+    GPIO.output(DIR_PIN, direction)  # Set direction
+    for _ in range(steps):
+        GPIO.output(STEP_PIN, GPIO.HIGH)
+        time.sleep(0.0001)  # Pulse width (Lower = Faster)
+        GPIO.output(STEP_PIN, GPIO.LOW)
+        time.sleep(0.0001)
 
 try:
     while True:
@@ -80,19 +98,24 @@ try:
 
             print(f"Predicted Class: {prediction}")
 
-            # Perform action based on classification
+            # Perform action based on classification and rotate the motor accordingly
             if prediction == 0:
                 print("Sorting: Plastic")
+                rotate_stepper_motor(10000) 
             elif prediction == 1:
-                print("Sorting: Glass")
+                print("Sorting: Aluminum")
+                rotate_stepper_motor(10000)
             elif prediction == 2:
-                print("Sorting: Metal")
+                print("Sorting: Glass")
+                rotate_stepper_motor(10000)
             else:
                 print("Unknown item")
 
-        time.sleep(1)  # Wait before the next detection
+        time.sleep(5)  # Wait before the next detection
 
 except KeyboardInterrupt:
     print("Stopping...")
+    GPIO.output(ENA_PIN, GPIO.LOW)  # Disable motor
     GPIO.cleanup()
     picam2.stop()
+    cv2.destroyAllWindows()

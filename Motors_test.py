@@ -1,7 +1,6 @@
 import RPi.GPIO as GPIO
 import time
 
-# Define GPIO Pins (Make sure these match your wiring)
 STEP_PIN = 17  # PUL- (Pulled LOW)
 DIR_PIN = 27   # DIR- (Pulled LOW)
 ENA_PIN = 22   # ENA- (Pulled LOW)
