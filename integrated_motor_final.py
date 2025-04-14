@@ -96,7 +96,7 @@ def calculateChange(payout_value):
     total_value += payout_value
     display_total_value = str(total_value)
     # Remove the decimal point from display_total_value and if the number is smaller than 4 digits then add 0's to the left until it is 4 digits long
-    
+    # Display the number with displayNumber(display_total_value) from seven_segment_initial.py
 
 try:
     while True:
