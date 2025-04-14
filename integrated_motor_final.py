@@ -37,6 +37,8 @@ picam2 = Picamera2()
 picam2.configure(picam2.create_still_configuration(main={"size": (224, 224)}))  # model-compatible size
 picam2.start()
 
+total_value = 0.0
+
 def get_distance():
     """Measures distance using an ultrasonic sensor."""
     GPIO.output(TRIG, True)
@@ -89,8 +91,21 @@ def rotate_stepper_motor_1(steps, direction):
         GPIO.output(STEP_PIN, GPIO.LOW)
         time.sleep(0.0001)
 
+# Calculate change to display
+def calculateChange(payout_value):
+    total_value += payout_value
+    display_total_value = str(total_value)
+    # Remove the decimal point from display_total_value and if the number is smaller than 4 digits then add 0's to the left until it is 4 digits long
+    
+
 try:
     while True:
+        payout_value = 0.0
+        plastic_value = 0.1 # 10 cents
+        aluminum_value = 0.05 # 5 cents
+        glass_value = 0.03 # 3 cents
+        none_value = 0.0 # 0 cents, why are you trying to recycle this item
+        
         distance = get_distance()
         print(f"Distance: {distance:.2f} cm")
 
@@ -103,15 +118,19 @@ try:
 
             # Perform action based on classification and rotate the first motor accordingly
             if prediction == 0:
+                payout_value = plastic_value
                 print("Sorting: Plastic")
                 rotate_stepper_motor_1(1600, direction=GPIO.HIGH) # Plastic -> push left = 180 clockwise (top motor)
             elif prediction == 1:
+                payout_value = aluminum_value
                 print("Sorting: Aluminum")
                 rotate_stepper_motor_1(1600, direction=GPIO.LOW) # Aluminum -> push right = 180 counterclockwise (top motor)
             elif prediction == 2:
+                payout_value = glass_value
                 print("Sorting: Glass")
                 rotate_stepper_motor_1(1600, direction=GPIO.LOW) # Glass -> push right = 180 counterclockwise (top motor)
             elif prediction == 3:
+                payout_value = none_value
                 print("Unknown Item")
                 rotate_stepper_motor_1(1600, direction=GPIO.HIGH) # None -> push left = 180 clockwise (top motor)
 
