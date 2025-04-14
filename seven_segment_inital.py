@@ -34,9 +34,10 @@ DIGIT_SEGMENTS = {
     '7': ['A', 'B', 'C'],
     '8': ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
     '9': ['A', 'B', 'C', 'D', 'F', 'G'],
+    'a': []
 }
 
-current_display = "    " # 4 spaces = invalid digits -> nothing on
+current_display = "aaaa" # 4 a's -> nothing on
 display_timeout = 0
 
 # Display the passed in number on 7 segment display
@@ -47,7 +48,7 @@ def displayNumber(number_str):
         segments = DIGIT_SEGMENTS.get(num, [])
       
         for seg, pin in SEGMENT_PINS.items():
-          if seg == 'DP':
+          if seg == 'DP' and segments != []:
             GPIO.output(pin, GPIO.HIGH if i == 1 else GPIO.LOW) # Display decimal point after 2nd number
           else:
             GPIO.output(pin, GPIO.HIGH if seg in segments else GPIO.LOW) # Activate corresponding segments of the digit
@@ -65,6 +66,6 @@ def updateDisplay():
   global current_display, display_timeout
   while True:
     if time.time() >= display_timeout:
-      current_display = "    " # Timeout reache, stop displaying
+      current_display = "aaaa" # Timeout reached, stop displaying
     displayNumber(current_display)
     time.sleep(0.01) # Delay for checks
