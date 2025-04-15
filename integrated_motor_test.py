@@ -58,7 +58,7 @@ def get_distance():
 
 def capture_image():
     """Captures an image and converts it to UINT8 for the TFLite model."""
-    picam2.capture_file("image_large.jpg")  # Save image 
+    picam2.capture_file("image_large.jpg")  # Save image
     img = cv2.imread("image_large.jpg")  # Read image
     img = cv2.resize(img, (224, 224))  # Resize for model
     img = img.astype(np.uint8)  # Convert to UINT8 (expected by model)
