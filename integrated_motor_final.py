@@ -7,30 +7,30 @@ import tflite_runtime.interpreter as tflite
 import threading
 
 # GPIO Pin Setup
-TRIG = 23 # Ultrasonic Trigger Pin
+TRIG = 16 # Ultrasonic Trigger Pin
 ECHO = 24 # Ultrasonic Echo Pin
 STEP_PIN = 17 # Top motor step pin
 DIR_PIN = 27 # Top motor direction pin
 ENA_PIN = 22 # Top motor enable pin
 
-STEP_PIN_2 = 14 # Lower left motor step pin
-DIR_PIN_2 = 15 # Lower left motor direction pin
-ENA_PIN_2 = 4 # Lower left motor enable pin
+STEP_PIN_2 = 6 # Lower left motor step pin
+DIR_PIN_2 = 12 # Lower left motor direction pin
+ENA_PIN_2 = 13 # Lower left motor enable pin
 
-STEP_PIN_3 = 9 # Lower right motor step pin
-DIR_PIN_3 = 10 # Lower right motor direction pin
-ENA_PIN_3 = 11 # Lower right motor enable pin
+STEP_PIN_3 = 23 # Lower right motor step pin
+DIR_PIN_3 = 25 # Lower right motor direction pin
+ENA_PIN_3 = 5 # Lower right motor enable pin
 
 # 7-Segment display pins (A to G, DP)
 # Random pin numbers, change based on wiring
 SEGMENT_PINS = {
-    'A': 5, 'B': 6, 'C': 13, 'D': 19,
-    'E': 26, 'F': 12, 'G': 16, 'DP': 20
+    'A': 7, 'B': 8, 'C': 14, 'D': 19,
+    'E': 26, 'F': 18, 'G': 28, 'DP': 20
 }
 
 # Digit select pins
 # Random pin numbers, change based on wiring
-DIGIT_PINS = [18, 25, 8, 7]
+DIGIT_PINS = [29, 30, 31, 32]
 
 # Motor and Ultrasonic GPIO setup
 GPIO.setmode(GPIO.BCM)
