@@ -9,9 +9,17 @@ import threading
 # GPIO Pin Setup
 TRIG = 23 # Ultrasonic Trigger Pin
 ECHO = 24 # Ultrasonic Echo Pin
-STEP_PIN = 17
-DIR_PIN = 27
-ENA_PIN = 22
+STEP_PIN = 17 # Top motor step pin
+DIR_PIN = 27 # Top motor direction pin
+ENA_PIN = 22 # Top motor enable pin
+
+STEP_PIN_2 = 14 # Lower left motor step pin
+DIR_PIN_2 = 15 # Lower left motor direction pin
+ENA_PIN_2 = 4 # Lower left motor enable pin
+
+STEP_PIN_3 = 9 # Lower right motor step pin
+DIR_PIN_3 = 10 # Lower right motor direction pin
+ENA_PIN_3 = 11 # Lower right motor enable pin
 
 # 7-Segment display pins (A to G, DP)
 # Random pin numbers, change based on wiring
@@ -27,12 +35,28 @@ DIGIT_PINS = [18, 25, 8, 7]
 # Motor and Ultrasonic GPIO setup
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
-GPIO.setup(TRIG, GPIO.OUT)
+
+GPIO.setup(TRIG, GPIO.OUT) # Ultrasonic sensor
 GPIO.setup(ECHO, GPIO.IN)
-GPIO.setup(STEP_PIN, GPIO.OUT)
+
+GPIO.setup(STEP_PIN, GPIO.OUT) # Top motor
 GPIO.setup(DIR_PIN, GPIO.OUT)
 GPIO.setup(ENA_PIN, GPIO.OUT)
-GPIO.output(ENA_PIN, GPIO.HIGH) # Enable the stepper motor (HIGH = On)
+GPIO.output(ENA_PIN, GPIO.HIGH) # Enable first stepper motor (HIGH = On)
+
+GPIO.setup(STEP_PIN_2, GPIO.OUT) # Lower left motor
+GPIO.setup(DIR_PIN_2, GPIO.OUT)
+GPIO.setup(ENA_PIN_2, GPIO.OUT)
+GPIO.output(ENA_PIN_2, GPIO.HIGH) # Enable second motor
+
+GPIO.setup(STEP_PIN_3, GPIO.OUT) # Lower right motor
+GPIO.setup(DIR_PIN_3, GPIO.OUT)
+GPIO.setup(ENA_PIN_3, GPIO.OUT)
+GPIO.output(ENA_PIN_3, GPIO.HIGH) # Enable third motor
+
+LED_PIN = 21
+GPIO.setup(LED_PIN, GPIO.OUT)
+GPIO.output(LED_PIN, GPIO.LOW)  # Start with LED off
 
 # 7-Segment Setup
 for pin in SEGMENT_PINS.values():
@@ -72,6 +96,7 @@ DIGIT_SEGMENTS = {
 
 current_display = "aaaa" # 4 a's -> nothing on
 display_timeout = 0
+total_value = 0.0
 
 # Display the passed in number on 7 segment display
 def displayNumber(number_str):
@@ -96,10 +121,11 @@ def displayChange(new_display):
 
 # Check if timeout has been reached, if not then keep displaying
 def updateDisplay():
-    global current_display, display_timeout
+    global total_value, current_display, display_timeout
     while True:
         if time.time() >= display_timeout:
             current_display = "aaaa" # Timeout reached, stop displaying
+            total_value = 0.0 # Timeout reached, reset payout value
         displayNumber(current_display)
         time.sleep(0.01) # Delay for checks
 
@@ -155,12 +181,29 @@ def rotate_stepper_motor_1(steps, direction):
     GPIO.output(DIR_PIN, direction) # Set direction
     for _ in range(steps):
         GPIO.output(STEP_PIN, GPIO.HIGH)
-        time.sleep(0.0001) # Pulse width (Lower = Faster)
+        time.sleep(0.001) # Pulse width (Lower = Faster)
         GPIO.output(STEP_PIN, GPIO.LOW)
-        time.sleep(0.0001)
+        time.sleep(0.001)
 
-total_value = 0.0
+# Rotates the lower left stepper motor by 180 degrees in determined direction for sorting
+def rotate_stepper_motor_2(steps, direction):
+    GPIO.output(DIR_PIN_2, direction) # Set direction
+    for _ in range(steps):
+        GPIO.output(STEP_PIN_2, GPIO.HIGH)
+        time.sleep(0.001) # Pulse width (Lower = Faster)
+        GPIO.output(STEP_PIN_2, GPIO.LOW)
+        time.sleep(0.001)
 
+# Rotates the lower right stepper motor by 180 degrees in determined direction for sorting
+def rotate_stepper_motor_3(steps, direction):
+    GPIO.output(DIR_PIN_3, direction) # Set direction
+    for _ in range(steps):
+        GPIO.output(STEP_PIN_3, GPIO.HIGH)
+        time.sleep(0.001) # Pulse width (Lower = Faster)
+        GPIO.output(STEP_PIN_3, GPIO.LOW)
+        time.sleep(0.001)
+
+# Caclulate value to display and handle input format
 def calculateChange(payout_value):
     global total_value
     total_value += payout_value
@@ -182,6 +225,7 @@ try:
 
         if distance < 30.5: # Object detected within 1 foot, take picture
             print("Object detected! Capturing image...")
+            GPIO.output(LED_PIN, GPIO.HIGH)  # Turn ON LED
             image = capture_image()
             prediction = classify_image(image)
 
@@ -192,26 +236,35 @@ try:
                 payout_value = plastic_value
                 print("Sorting: Plastic")
                 rotate_stepper_motor_1(1600, GPIO.HIGH) # Plastic -> push left = 180 clockwise (top motor)
+                rotate_stepper_motor_2(1600, GPIO.LOW) # Plastic -> push right = 180 counterclockwise (lower left motor)
             elif prediction == 1:
                 payout_value = aluminum_value
                 print("Sorting: Aluminum")
                 rotate_stepper_motor_1(1600, GPIO.LOW) # Aluminum -> push right = 180 counterclockwise (top motor)
+                rotate_stepper_motor_3(1600, GPIO.HIGH) # Aluminum -> push left = 180 clockwise (lower right motor)
             elif prediction == 2:
                 payout_value = glass_value
                 print("Sorting: Glass")
                 rotate_stepper_motor_1(1600, GPIO.LOW) # Glass -> push right = 180 counterclockwise (top motor)
+                rotate_stepper_motor_3(1600, GPIO.LOW) # Glass -> push right = 180 counterclockwise (lower right motor)
             elif prediction == 3:
                 payout_value = none_value
                 print("Unknown Item")
                 rotate_stepper_motor_1(1600, GPIO.HIGH) # None -> push left = 180 clockwise (top motor)
+                rotate_stepper_motor_2(1600, GPIO.HIGH) # None -> push left = 180 clockwise (lower left motor)
 
             calculateChange(payout_value)
 
-        time.sleep(5) # Wait 5 seconds before the next detection
+            time.sleep(3) # Wait 3 seconds before the next detection
+            GPIO.output(LED_PIN, GPIO.LOW) # Turn off LED, next item able to be inserted
+            
+        time.sleep(1) # Wait 1 second between checks so ultrasonic sensor doesn't spam
 
 except KeyboardInterrupt:
     print("Stopping...")
-    GPIO.output(ENA_PIN, GPIO.LOW) # Disable motor
+    GPIO.output(ENA_PIN, GPIO.LOW) # Disable top motor
+    GPIO.output(ENA_PIN_2, GPIO.LOW) # Disable lower left motor
+    GPIO.output(ENA_PIN_3, GPIO.LOW) # Disable lower right motor
     GPIO.cleanup()
     picam2.stop()
     cv2.destroyAllWindows()
