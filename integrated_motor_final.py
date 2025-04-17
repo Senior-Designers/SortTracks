@@ -7,30 +7,37 @@ import tflite_runtime.interpreter as tflite
 import threading
 
 # GPIO Pin Setup
-TRIG = 16 # Ultrasonic Trigger Pin
-ECHO = 24 # Ultrasonic Echo Pin
-STEP_PIN = 17 # Top motor step pin
-DIR_PIN = 27 # Top motor direction pin
-ENA_PIN = 22 # Top motor enable pin
+TRIG = 0 # Ultrasonic Trigger Pin                (Physical = 27)
+ECHO = 1 # Ultrasonic Echo Pin                   (Physical = 28)
+STEP_PIN = 17 # Top motor step pin               (Physical = 11)
+DIR_PIN = 27 # Top motor direction pin           (Physical = 13)
+ENA_PIN = 22 # Top motor enable pin              (Physical = 15)
 
-STEP_PIN_2 = 6 # Lower left motor step pin
-DIR_PIN_2 = 12 # Lower left motor direction pin
-ENA_PIN_2 = 13 # Lower left motor enable pin
+STEP_PIN_2 = 6 # Lower left motor step pin       (Physical = 31)
+DIR_PIN_2 = 12 # Lower left motor direction pin  (Physical = 32)
+ENA_PIN_2 = 13 # Lower left motor enable pin     (Physical = 33)
 
-STEP_PIN_3 = 23 # Lower right motor step pin
-DIR_PIN_3 = 25 # Lower right motor direction pin
-ENA_PIN_3 = 5 # Lower right motor enable pin
+STEP_PIN_3 = 23 # Lower right motor step pin     (Physical = 16)
+DIR_PIN_3 = 25 # Lower right motor direction pin (Physical = 22)
+ENA_PIN_3 = 5 # Lower right motor enable pin     (Physical = 29)
+
+# Physical GPIO: 3 5 7 8  10 11 12 13 15 16 18 19 21 22 23 24 26 27 28 29 31 32 33 35 36 37 38 40 (All Physical)
+# Digital  GPIO: 2 3 4 14 15 17 18 27 22 23 24 10 9  25 11 8  7  0  1  5  6  12 13 19 16 26 16 21 (All Digital)
+
+# Physical GPIO: 11 13 15 31 32 33 16 22 29 3  5  7  8  10 12 18 19 21 23 24 26 27 28 35 (Used)
+# Physical GPIO: 36 37 38 40 (Free)
+# Digital  GPIO: 16 26 16 21 (Free)
 
 # 7-Segment display pins (A to G, DP)
-# Random pin numbers, change based on wiring
+# Physical Pins: A = 3 B = 5 C = 7 D = 8
+# Physical Pins: E = 10 F = 12 G = 18 DP = 19
 SEGMENT_PINS = {
-    'A': 7, 'B': 8, 'C': 14, 'D': 19,
-    'E': 26, 'F': 18, 'G': 28, 'DP': 20
+    'A': 2, 'B': 3, 'C': 4, 'D': 14,
+    'E': 15, 'F': 18, 'G': 24, 'DP': 10
 }
 
 # Digit select pins
-# Random pin numbers, change based on wiring
-DIGIT_PINS = [29, 30, 31, 32]
+DIGIT_PINS = [9, 11, 8, 7] # Physical Pins: 21 23 24 26
 
 # Motor and Ultrasonic GPIO setup
 GPIO.setmode(GPIO.BCM)
@@ -54,7 +61,7 @@ GPIO.setup(DIR_PIN_3, GPIO.OUT)
 GPIO.setup(ENA_PIN_3, GPIO.OUT)
 GPIO.output(ENA_PIN_3, GPIO.HIGH) # Enable third motor
 
-LED_PIN = 21
+LED_PIN = 19 # (Physical = 35)
 GPIO.setup(LED_PIN, GPIO.OUT)
 GPIO.output(LED_PIN, GPIO.LOW)  # Start with LED off
 
