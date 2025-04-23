@@ -37,7 +37,12 @@ DIGIT_SEGS    = {
 # —————————————
 counter = 0
 current_display = "    "
-display_timeout = 0.0
+display_timeout = 0
+payout_value = 0
+plastic_value = 10
+aluminum_value = 5
+glass_value = 3
+none_value = 0
 
 # Load TFLite Model
 interpreter = tflite.Interpreter(model_path="model.tflite")
@@ -161,6 +166,7 @@ GPIO.setwarnings(False)
 # ultrasonic
 GPIO.setup(TRIG_PIN, GPIO.OUT)
 GPIO.setup(ECHO_PIN, GPIO.IN)
+
 # steppers + LED
 for p in (STEP_PIN,DIR_PIN,ENA_PIN, STEP_PIN_2,DIR_PIN_2,ENA_PIN_2, STEP_PIN_3,DIR_PIN_3,ENA_PIN_3, LED_PIN):
     GPIO.setup(p, GPIO.OUT)
@@ -203,26 +209,44 @@ try:
             image = capture_image()
             prediction = classify_image(image)
 
-            # bump by 5 on every sort:
-            counter = (counter + 5) % 10000
-            displayChange(counter)
-            # rotate steppers based on cls
-            if prediction==0:
+            # Perform action based on classification and rotate the first motor accordingly
+            if prediction == 0:
+                payout_value = (payout_value + plastic_value) % 10000
+                displayChange(payout_value)
                 print("Sorting: Plastic")
-                rotate_stepper_motor_1(1600, GPIO.HIGH)
-                rotate_stepper_motor_2(1600, GPIO.LOW)
-            elif prediction==1:
+                rotate_stepper_motor_1(1600, GPIO.HIGH) # Plastic -> push left = 180 clockwise (top motor)
+                rotate_stepper_motor_2(1600, GPIO.LOW) # Plastic -> push right = 180 counterclockwise (lower left motor)
+
+                rotate_stepper_motor_1(1600, GPIO.HIGH) # Reset 180 clockwise (top motor)
+                rotate_stepper_motor_2(1600, GPIO.LOW) # Reset 180 counterclockwise (lower left motor)
+            elif prediction == 1:
+                payout_value = (payout_value + aluminum_value) % 10000
+                displayChange(payout_value)
                 print("Sorting: Aluminum")
-                rotate_stepper_motor_1(1600, GPIO.LOW)
-                rotate_stepper_motor_3(1600, GPIO.HIGH)
-            elif prediction==2:
+                rotate_stepper_motor_1(1600, GPIO.LOW) # Aluminum -> push right = 180 counterclockwise (top motor)
+                rotate_stepper_motor_3(1600, GPIO.HIGH) # Aluminum -> push left = 180 clockwise (lower right motor)
+
+                rotate_stepper_motor_1(1600, GPIO.LOW) # Reset 180 counterclockwise (top motor)
+                rotate_stepper_motor_3(1600, GPIO.HIGH) # Reset 180 clockwise (lower right motor)
+            elif prediction == 2:
+                payout_value = (payout_value + glass_value) % 10000
+                displayChange(payout_value)
                 print("Sorting: Glass")
-                rotate_stepper_motor_1(1600, GPIO.LOW)
-                rotate_stepper_motor_3(1600, GPIO.LOW)
+                rotate_stepper_motor_1(1600, GPIO.LOW) # Glass -> push right = 180 counterclockwise (top motor)
+                rotate_stepper_motor_3(1600, GPIO.LOW) # Glass -> push right = 180 counterclockwise (lower right motor)
+
+                rotate_stepper_motor_1(1600, GPIO.LOW) # Reset 180 counterclockwise (top motor)
+                rotate_stepper_motor_3(1600, GPIO.LOW) # Reset 180 counterclockwise (lower right motor)
             elif prediction == 3:
+                payout_value = (payout_value + none_value) % 10000
+                displayChange(payout_value)
                 print("Unknown Item")
-                rotate_stepper_motor_1(1600, GPIO.HIGH)
-                rotate_stepper_motor_2(1600, GPIO.HIGH)
+                rotate_stepper_motor_1(1600, GPIO.HIGH) # None -> push left = 180 clockwise (top motor)
+                rotate_stepper_motor_2(1600, GPIO.HIGH) # None -> push left = 180 clockwise (lower left motor)
+
+                rotate_stepper_motor_1(1600, GPIO.HIGH) # Reset 180 clockwise (top motor)
+                rotate_stepper_motor_2(1600, GPIO.HIGH) # Reset 180 clockwise (lower left motor)
+
             GPIO.output(LED_PIN, GPIO.LOW)
             time.sleep(1)
         time.sleep(0.1)
