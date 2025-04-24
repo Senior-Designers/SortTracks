@@ -13,9 +13,10 @@ TRIG_PIN   = 23 # Physical: 16
 ECHO_PIN   = 24 # Physical: 18
 
 # Steppers
-STEP_PIN   = 17; DIR_PIN   = 27; ENA_PIN   = 22 # Physical: 11, 13, 15 (top)         half works
-STEP_PIN_2 = 14; DIR_PIN_2 = 7;  ENA_PIN_2 = 21 # Physical: 8,  26, 40 (lower left)  doesn't work
+STEP_PIN   = 17; DIR_PIN   = 14; ENA_PIN   = 22 # Physical: 11, 8, 15 (top)          half works
+STEP_PIN_2 = 27; DIR_PIN_2 = 7;  ENA_PIN_2 = 21 # Physical: 13, 26, 40 (lower left) doesn't work
 STEP_PIN_3 = 9;  DIR_PIN_3 = 10; ENA_PIN_3 = 11 # Physical: 21, 19, 23 (lower right) works
+# Physical 8 is dead, one to three of 13, 26, 40 is dead
 
 # LED
 LED_PIN    = 19 # Physical: 35
@@ -115,6 +116,7 @@ def get_distance():
 def capture_image():
     picam2.capture_file("image_large.jpg") # Save image
     img = cv2.imread("image_large.jpg") # Read image
+    img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
     img = cv2.resize(img, (224, 224)) # Resize for model
     img = img.astype(np.uint8) # Convert to UINT8 (expected by model)
     img = np.expand_dims(img, axis=0) # Add batch dimension
@@ -143,7 +145,7 @@ def classify_image(image):
 # —————————————
 # Rotates the first stepper motor by 180 degrees in determined direction for sorting
 def rotate_stepper_motor_1(steps, direction):
-    GPIO.output(DIR_PIN, direction) # Set direction
+    GPIO.output(DIR_PIN_3, direction) # Set direction
     for _ in range(steps):
         GPIO.output(STEP_PIN, GPIO.HIGH)
         time.sleep(0.001) # Pulse width (Lower = Faster)
@@ -151,16 +153,7 @@ def rotate_stepper_motor_1(steps, direction):
         time.sleep(0.001)
 
 # Rotates the lower left stepper motor by 180 degrees in determined direction for sorting
-def rotate_stepper_motor_2(steps, direction):
-    GPIO.output(DIR_PIN_2, direction) # Set direction
-    for _ in range(steps):
-        GPIO.output(STEP_PIN_2, GPIO.HIGH)
-        time.sleep(0.001) # Pulse width (Lower = Faster)
-        GPIO.output(STEP_PIN_2, GPIO.LOW)
-        time.sleep(0.001)
-
-# Rotates the lower right stepper motor by 180 degrees in determined direction for sorting
-def rotate_stepper_motor_3(steps, direction):
+def rotate_stepper_motors_2_3(steps, direction):
     GPIO.output(DIR_PIN_3, direction) # Set direction
     for _ in range(steps):
         GPIO.output(STEP_PIN_3, GPIO.HIGH)
@@ -225,49 +218,45 @@ try:
                 payout_value = (payout_value + plastic_value) % 10000
                 displayChange(payout_value)
                 print("Sorting: Plastic")
-                rotate_stepper_motor_1(1600, GPIO.LOW) # Plastic -> push left = 180 clockwise (top motor)
-                rotate_stepper_motor_2(1600, GPIO.LOW) # Plastic -> push right = 180 counterclockwise (lower left motor)
+                rotate_stepper_motor_1(1600, GPIO.HIGH) # Plastic -> push left = 180 counterclockwise (top motor)
+                rotate_stepper_motors_2_3(1600, GPIO.LOW) # Plastic -> push right = 180 clockwise (both motor)
 
-                rotate_stepper_motor_1(1600, GPIO.LOW) # Reset 180 clockwise (top motor)
-                rotate_stepper_motor_2(1600, GPIO.LOW) # Reset 180 counterclockwise (lower left motor)
+                rotate_stepper_motor_1(1600, GPIO.HIGH) # Reset 180 counterclockwise (top motor)
+                rotate_stepper_motors_2_3(1600, GPIO.LOW) # Reset 180 clockwise (lower left motor)
             elif prediction == 1:
                 payout_value = (payout_value + aluminum_value) % 10000
                 displayChange(payout_value)
                 print("Sorting: Aluminum")
 
-                #GPIO.output(ENA_PIN, GPIO.LOW)
-                rotate_stepper_motor_1(1600, GPIO.LOW)
-                rotate_stepper_motor_1(1600, GPIO.HIGH)
+                #rotate_stepper_motor_1(1600, GPIO.LOW) # cw
+                #rotate_stepper_motor_1(1600, GPIO.HIGH) # ccw
 
-                rotate_stepper_motor_2(1600, GPIO.LOW)
-                rotate_stepper_motor_2(1600, GPIO.HIGH)
+                #rotate_stepper_motors_2_3(1600, GPIO.LOW) # cw
+                #rotate_stepper_motors_2_3(1600, GPIO.HIGH) # ccw
 
-                rotate_stepper_motor_3(1600, GPIO.LOW)
-                rotate_stepper_motor_3(1600, GPIO.HIGH)
+                rotate_stepper_motor_1(1600, GPIO.LOW) # Aluminum -> push right = 180 clockwise (top motor)
+                rotate_stepper_motors_2_3(1600, GPIO.HIGH) # Aluminum -> push left = 180 counterclockwise (lower right motor)
 
-                rotate_stepper_motor_1(1600, GPIO.HIGH) # Aluminum -> push right = 180 clockwise (top motor)
-                rotate_stepper_motor_3(1600, GPIO.HIGH) # Aluminum -> push left = 180 counterclockwise (lower right motor)
-                # 3 works, flip 1
                 rotate_stepper_motor_1(1600, GPIO.HIGH) # Reset 180 counterclockwise (top motor)
-                rotate_stepper_motor_3(1600, GPIO.HIGH) # Reset 180 clockwise (lower right motor)
+                rotate_stepper_motors_2_3(1600, GPIO.HIGH) # Reset 180 clockwise (lower right motor)
             elif prediction == 2:
                 payout_value = (payout_value + glass_value) % 10000
                 displayChange(payout_value)
                 print("Sorting: Glass")
-                rotate_stepper_motor_1(1600, GPIO.LOW) # Glass -> push right = 180 counterclockwise (top motor)
-                rotate_stepper_motor_3(1600, GPIO.LOW) # Glass -> push right = 180 counterclockwise (lower right motor)
+                rotate_stepper_motor_1(1600, GPIO.LOW) # Glass -> push right = 180 clockwise (top motor)
+                rotate_stepper_motors_2_3(1600, GPIO.LOW) # Glass -> push right = 180 clockwise (lower right motor)
 
-                rotate_stepper_motor_1(1600, GPIO.LOW) # Reset 180 counterclockwise (top motor)
-                rotate_stepper_motor_3(1600, GPIO.LOW) # Reset 180 counterclockwise (lower right motor)
+                rotate_stepper_motor_1(1600, GPIO.LOW) # Reset 180 clockwise (top motor)
+                rotate_stepper_motors_2_3(1600, GPIO.LOW) # Reset 180 clockwise (lower right motor)
             elif prediction == 3:
                 payout_value = (payout_value + none_value) % 10000
                 displayChange(payout_value)
                 print("Unknown Item")
-                rotate_stepper_motor_1(1600, GPIO.HIGH) # None -> push left = 180 clockwise (top motor)
-                rotate_stepper_motor_2(1600, GPIO.HIGH) # None -> push left = 180 clockwise (lower left motor)
+                rotate_stepper_motor_1(1600, GPIO.HIGH) # None -> push left = 180 counterclockwise (top motor)
+                rotate_stepper_motors_2_3(1600, GPIO.HIGH) # None -> push left = 180 counterclockwise (lower left motor)
 
-                rotate_stepper_motor_1(1600, GPIO.HIGH) # Reset 180 clockwise (top motor)
-                rotate_stepper_motor_2(1600, GPIO.HIGH) # Reset 180 clockwise (lower left motor)
+                rotate_stepper_motor_1(1600, GPIO.HIGH) # Reset 180 counterclockwise (top motor)
+                rotate_stepper_motors_2_3(1600, GPIO.HIGH) # Reset 180 counterclockwise (lower left motor)
 
             GPIO.output(LED_PIN, GPIO.LOW)
             time.sleep(1)
