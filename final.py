@@ -10,16 +10,16 @@ import tflite_runtime.interpreter as tflite
 # —————————————
 # PIN ASSIGNMENTS
 # —————————————
-TRIG_PIN   = 23
-ECHO_PIN   = 24
+TRIG_PIN   = 23 # Physical: 16
+ECHO_PIN   = 24 # Physical: 18
 
 # Steppers
-STEP_PIN   = 17; DIR_PIN   = 27; ENA_PIN   = 22
-STEP_PIN_2 = 14; DIR_PIN_2 = 7;  ENA_PIN_2 = 21 # Enable was 5
-STEP_PIN_3 = 9;  DIR_PIN_3 = 10; ENA_PIN_3 = 11
+STEP_PIN   = 17; DIR_PIN   = 27; ENA_PIN   = 22 # Physical: 11, 13, 15 (top) half works
+STEP_PIN_2 = 14; DIR_PIN_2 = 7;  ENA_PIN_2 = 21 # Physical: 8,  26, 40 (lower left) doesn't work
+STEP_PIN_3 = 9;  DIR_PIN_3 = 10; ENA_PIN_3 = 11 # Physical: 21, 19, 23 (lower right) works
 
 # LED
-LED_PIN    = 19
+LED_PIN    = 19 # Physical: 35
 
 # 7‑segment (common‑cathode)
 COMMON_ANODE  = False
