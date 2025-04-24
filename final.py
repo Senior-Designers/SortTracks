@@ -15,7 +15,7 @@ ECHO_PIN   = 24
 
 # Steppers
 STEP_PIN   = 17; DIR_PIN   = 27; ENA_PIN   = 22
-STEP_PIN_2 = 14; DIR_PIN_2 = 7;  ENA_PIN_2 = 5
+STEP_PIN_2 = 14; DIR_PIN_2 = 7;  ENA_PIN_2 = 21 # Enable was 5
 STEP_PIN_3 = 9;  DIR_PIN_3 = 10; ENA_PIN_3 = 11
 
 # LED
@@ -144,18 +144,32 @@ def classify_image(image):
 # —————————————
 # STEPPERS
 # —————————————
-def rotate(steps, step, direction, dir_pin):
-    GPIO.output(direction, dir_pin)
-    for _ in range(steps):
-        GPIO.output(step, GPIO.HIGH); time.sleep(0.001)
-        GPIO.output(step, GPIO.LOW ); time.sleep(0.001)
-
+# Rotates the first stepper motor by 180 degrees in determined direction for sorting
 def rotate_stepper_motor_1(steps, direction):
-    rotate(steps, STEP_PIN,   DIR_PIN,   direction)
+    GPIO.output(DIR_PIN, direction) # Set direction
+    for _ in range(steps):
+        GPIO.output(STEP_PIN, GPIO.HIGH)
+        time.sleep(0.001) # Pulse width (Lower = Faster)
+        GPIO.output(STEP_PIN, GPIO.LOW)
+        time.sleep(0.001)
+
+# Rotates the lower left stepper motor by 180 degrees in determined direction for sorting
 def rotate_stepper_motor_2(steps, direction):
-    rotate(steps, STEP_PIN_2, DIR_PIN_2, direction)
+    GPIO.output(DIR_PIN_2, direction) # Set direction
+    for _ in range(steps):
+        GPIO.output(STEP_PIN_2, GPIO.HIGH)
+        time.sleep(0.001) # Pulse width (Lower = Faster)
+        GPIO.output(STEP_PIN_2, GPIO.LOW)
+        time.sleep(0.001)
+
+# Rotates the lower right stepper motor by 180 degrees in determined direction for sorting
 def rotate_stepper_motor_3(steps, direction):
-    rotate(steps, STEP_PIN_3, DIR_PIN_3, direction)
+    GPIO.output(DIR_PIN_3, direction) # Set direction
+    for _ in range(steps):
+        GPIO.output(STEP_PIN_3, GPIO.HIGH)
+        time.sleep(0.001) # Pulse width (Lower = Faster)
+        GPIO.output(STEP_PIN_3, GPIO.LOW)
+        time.sleep(0.001)
 
 # —————————————
 # SETUP
@@ -214,19 +228,30 @@ try:
                 payout_value = (payout_value + plastic_value) % 10000
                 displayChange(payout_value)
                 print("Sorting: Plastic")
-                rotate_stepper_motor_1(1600, GPIO.HIGH) # Plastic -> push left = 180 clockwise (top motor)
+                rotate_stepper_motor_1(1600, GPIO.LOW) # Plastic -> push left = 180 clockwise (top motor)
                 rotate_stepper_motor_2(1600, GPIO.LOW) # Plastic -> push right = 180 counterclockwise (lower left motor)
 
-                rotate_stepper_motor_1(1600, GPIO.HIGH) # Reset 180 clockwise (top motor)
+                rotate_stepper_motor_1(1600, GPIO.LOW) # Reset 180 clockwise (top motor)
                 rotate_stepper_motor_2(1600, GPIO.LOW) # Reset 180 counterclockwise (lower left motor)
             elif prediction == 1:
                 payout_value = (payout_value + aluminum_value) % 10000
                 displayChange(payout_value)
                 print("Sorting: Aluminum")
-                rotate_stepper_motor_1(1600, GPIO.LOW) # Aluminum -> push right = 180 counterclockwise (top motor)
-                rotate_stepper_motor_3(1600, GPIO.HIGH) # Aluminum -> push left = 180 clockwise (lower right motor)
 
-                rotate_stepper_motor_1(1600, GPIO.LOW) # Reset 180 counterclockwise (top motor)
+                #GPIO.output(ENA_PIN, GPIO.LOW)
+                rotate_stepper_motor_1(1600, GPIO.LOW)
+                rotate_stepper_motor_1(1600, GPIO.HIGH)
+
+                rotate_stepper_motor_2(1600, GPIO.LOW)
+                rotate_stepper_motor_2(1600, GPIO.HIGH)
+
+                rotate_stepper_motor_3(1600, GPIO.LOW)
+                rotate_stepper_motor_3(1600, GPIO.HIGH)
+
+                rotate_stepper_motor_1(1600, GPIO.HIGH) # Aluminum -> push right = 180 clockwise (top motor)
+                rotate_stepper_motor_3(1600, GPIO.HIGH) # Aluminum -> push left = 180 counterclockwise (lower right motor)
+                # 3 works, flip 1
+                rotate_stepper_motor_1(1600, GPIO.HIGH) # Reset 180 counterclockwise (top motor)
                 rotate_stepper_motor_3(1600, GPIO.HIGH) # Reset 180 clockwise (lower right motor)
             elif prediction == 2:
                 payout_value = (payout_value + glass_value) % 10000
