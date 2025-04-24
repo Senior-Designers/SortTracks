@@ -200,9 +200,10 @@ try:
         dist = get_distance()
         print(f"Distance: {dist:.2f} cm")
 
-        if 0 < dist < 30.5: # Distance check for object
+        if 0 < dist < 13: # Distance check for object
             print("Object detected! Capturing image...")
             GPIO.output(LED_PIN, GPIO.HIGH) # Turn on LED
+            time.sleep(2)
 
             # Teachable Machine Inference
             image = capture_image()
@@ -214,6 +215,7 @@ try:
                 displayChange(payout_value)
                 print("Sorting: Plastic")
                 rotate_stepper_motor_1(1600, GPIO.HIGH) # Plastic -> push left = 180 counterclockwise (top motor)
+                time.sleep(0.5)
                 rotate_stepper_motors_2_3(1600, GPIO.LOW) # Plastic -> push right = 180 clockwise (both motor)
 
                 rotate_stepper_motor_1(1600, GPIO.HIGH) # Reset 180 counterclockwise (top motor)
@@ -224,6 +226,7 @@ try:
                 print("Sorting: Aluminum")
 
                 rotate_stepper_motor_1(1600, GPIO.LOW) # Aluminum -> push right = 180 clockwise (top motor)
+                time.sleep(0.5)
                 rotate_stepper_motors_2_3(1600, GPIO.HIGH) # Aluminum -> push left = 180 counterclockwise (lower right motor)
 
                 rotate_stepper_motor_1(1600, GPIO.HIGH) # Reset 180 counterclockwise (top motor)
@@ -233,6 +236,7 @@ try:
                 displayChange(payout_value)
                 print("Sorting: Glass")
                 rotate_stepper_motor_1(1600, GPIO.LOW) # Glass -> push right = 180 clockwise (top motor)
+                time.sleep(0.5)
                 rotate_stepper_motors_2_3(1600, GPIO.LOW) # Glass -> push right = 180 clockwise (lower right motor)
 
                 rotate_stepper_motor_1(1600, GPIO.LOW) # Reset 180 clockwise (top motor)
@@ -242,6 +246,7 @@ try:
                 displayChange(payout_value)
                 print("Unknown Item")
                 rotate_stepper_motor_1(1600, GPIO.HIGH) # None -> push left = 180 counterclockwise (top motor)
+                time.sleep(0.5)
                 rotate_stepper_motors_2_3(1600, GPIO.HIGH) # None -> push left = 180 counterclockwise (lower left motor)
 
                 rotate_stepper_motor_1(1600, GPIO.HIGH) # Reset 180 counterclockwise (top motor)
