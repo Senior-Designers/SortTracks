@@ -7,22 +7,20 @@ import RPi.GPIO as GPIO
 from picamera2 import Picamera2
 import tflite_runtime.interpreter as tflite
 
-# —————————————
-# PIN ASSIGNMENTS
-# —————————————
+# ————————————— PIN ASSIGNMENTS —————————————
 # Ultrasonic Sensor
 TRIG_PIN   = 23 # Physical: 16
 ECHO_PIN   = 24 # Physical: 18
 
 # Steppers
-STEP_PIN   = 17; DIR_PIN   = 27; ENA_PIN   = 22 # Physical: 11, 13, 15 (top) half works
-STEP_PIN_2 = 14; DIR_PIN_2 = 7;  ENA_PIN_2 = 21 # Physical: 8,  26, 40 (lower left) doesn't work
+STEP_PIN   = 17; DIR_PIN   = 27; ENA_PIN   = 22 # Physical: 11, 13, 15 (top)         half works
+STEP_PIN_2 = 14; DIR_PIN_2 = 7;  ENA_PIN_2 = 21 # Physical: 8,  26, 40 (lower left)  doesn't work
 STEP_PIN_3 = 9;  DIR_PIN_3 = 10; ENA_PIN_3 = 11 # Physical: 21, 19, 23 (lower right) works
 
 # LED
 LED_PIN    = 19 # Physical: 35
 
-# 7‑segment (common‑cathode)
+# 7‑Segment (common‑cathode)
 COMMON_ANODE  = False
 SEGMENT_PINS  = { 'A':5, 'B':6, 'C':12, 'D':13, 'E':15, 'F':19, 'G':20, 'DP':26 }
 DIGIT_PINS    = [25, 18, 8, 4]    # left→right
@@ -33,9 +31,7 @@ DIGIT_SEGS    = {
   '9':['A','B','C','D','F','G'],' ':[]
 }
 
-# —————————————
-# GLOBAL STATE
-# —————————————
+# ————————————— GLOBAL STATES —————————————
 counter = 0
 current_display = "    "
 display_timeout = 0
