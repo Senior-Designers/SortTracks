@@ -10,6 +10,7 @@ import tflite_runtime.interpreter as tflite
 # —————————————
 # PIN ASSIGNMENTS
 # —————————————
+# Ultrasonic Sensor
 TRIG_PIN   = 23 # Physical: 16
 ECHO_PIN   = 24 # Physical: 18
 
