@@ -6,6 +6,8 @@ import numpy as np
 import RPi.GPIO as GPIO
 from picamera2 import Picamera2
 import tflite_runtime.interpreter as tflite
+from datetime import datetime
+import os
 
 # ————————————— PIN ASSIGNMENTS —————————————
 # Ultrasonic Sensor GPIO
@@ -121,17 +123,28 @@ def get_distance():
 
 # Captures an image and converts it to UINT8 for the TFLite model
 def capture_image():
-    picam2.capture_file("image_large.jpg") # Save image
-    img = cv2.imread("image_large.jpg") # Read image
+    folder = "SortTracks/None" # Change to SortTracks/ClassName to save to that folder, then upload to Git
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    image_large = f"image_{timestamp}_large.jpg"
+
+    picam2.capture_file(image_large) # Save image
+    img = cv2.imread(image_large) # Read image
     img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE) # Rotate image 90 degrees
     img = cv2.resize(img, (224, 224)) # Resize for model
     img = img.astype(np.uint8) # Convert to UINT8 (expected by model)
     img = np.expand_dims(img, axis=0) # Add batch dimension
     
-    # Save the captured image without displaying it
-    filename = "image_large.jpg"
-    cv2.imwrite(filename, img[0])
-    print(f"Image saved as {filename}")
+    # Save the captured image to correct folder for further model training
+    image_processed = os.path.join(folder, f"image_{timestamp}_processed.jpg")
+    cv2.imwrite(image_processed, img[0])
+
+    # Save current image, overwrite old one
+    image_save = image_large
+    image_save = "image_large.jpg"
+    cv2.imwrite(image_save, img[0])
+    os.remove(image_large) # Remove timestamped image from the cwd while keeping the timestamped one in the class folder safe
+
+    print(f"Images saved:\n- Original: {image_save}\n- Processed: {image_processed}")
     
     return img
 
