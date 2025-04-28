@@ -6,7 +6,7 @@ from picamera2 import Picamera2
 import tflite_runtime.interpreter as tflite
 import threading
 
-# GPIO Pin Setup
+# GPIO Pin Setup (old pins, probably doesn't work)
 TRIG = 0 # Ultrasonic Trigger Pin                (Physical = 27)
 ECHO = 1 # Ultrasonic Echo Pin                   (Physical = 28)
 STEP_PIN = 17 # Top motor step pin               (Physical = 11)
