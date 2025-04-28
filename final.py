@@ -100,7 +100,7 @@ def displayLoop():
 def displayChange(val:int):
     global current_display, display_timeout
     current_display = f"{val:04d}"
-    display_timeout = time.time() + 10.0
+    display_timeout = time.time() + 60.0
 
 # ————————————— DISTANCE —————————————
 # Pings the ultrasonic sensor to check the distance of the nearest object (cone shaped)
@@ -136,9 +136,11 @@ def classify_image(image):
     output_data = interpreter.get_tensor(output_details[0]['index'])
     confidence = np.max(output_data)
     predicted_class = np.argmax(output_data)
+
+    print(f"Prediction values:\n{output_data}")
     
-    if confidence < 0.5:
-        predicted_class = 3 # Confidence too low (below 50%), select none
+    if confidence < 63.75:
+        predicted_class = 3 # Confidence too low (below 25%), select none
     return predicted_class
 
 # ————————————— STEPPERS —————————————
