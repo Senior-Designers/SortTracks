@@ -72,15 +72,21 @@ def clear_display():
     for p in DIGIT_PINS:            set_digit(p,   False)
 
 # Flash each digit quickly to "stay on"
-def displayNumber(s:str):
+def displayNumber(s:str, decimal_on):
     """One multiplex cycle for string s (length 4)."""
     for i,ch in enumerate(s):
         # 1) blank all digits
         for dp in DIGIT_PINS: set_digit(dp, False)
+
         # 2) set segments
         segs = DIGIT_SEGS.get(ch, [])
+
+        if decimal_on and i == 1:  # After second number
+            segs = segs + ['DP']  # turn ON decimal point
+
         for seg,p in SEGMENT_PINS.items():
             set_segment(p, seg in segs)
+
         # 3) enable only digit i
         set_digit(DIGIT_PINS[i], True)
         time.sleep(0.002)
@@ -91,9 +97,9 @@ def displayLoop():
     global current_display, display_timeout
     while True:
         if time.time() >= display_timeout:
-            displayNumber("    ")
+            displayNumber("    ", False)
         else:
-            displayNumber(current_display)
+            displayNumber(current_display, True)
         # next cycle in ~2ms
 
 # Call this whenever you want to show a new value for 5s
