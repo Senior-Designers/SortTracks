@@ -44,7 +44,7 @@ glass_value = 3
 none_value = 0
 
 # Load TFLite Model
-interpreter = tflite.Interpreter(model_path="model.tflite")
+interpreter = tflite.Interpreter(model_path="SortTracks/model.tflite")
 interpreter.allocate_tensors()
 
 # Get input and output tensor indices
