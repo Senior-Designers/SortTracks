@@ -11,9 +11,9 @@ try:
 
     while True:
         if GPIO.input(ARDUINO_SIGNAL_PIN) == GPIO.HIGH:
-            print("✅ Object detected within 13 cm!")
+            print("Object detected within 13 cm")
         else:
-            print("❌ No object or too far.")
+            print("No signal yet")
         time.sleep(0.5)
 
 except KeyboardInterrupt:
