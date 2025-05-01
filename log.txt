@@ -1,29 +1,28 @@
-Prediction values:
-[[171  18  52  15]]Prediction values:
-[[228   3  23   1]]Prediction values:
-[[227   7  20   2]]Prediction values:
-[[239   9   5   2]]Prediction values:
-[[129  34  89   4]]Prediction values:
-[[199   7  45   5]]Prediction values:
-[[202  42   9   3]]Prediction values:
-[[189  14  50   2]]Prediction values:
-[[205  11  32   8]]Prediction values:
-[[ 29 182  23  21]]Prediction values:
-[[ 40 186  22   8]]Prediction values:
-[[ 56 152  42   6]]Prediction values:
-[[ 37 210   6   3]]Prediction values:
-[[ 60 155  36   5]]Prediction values:
-[[ 29 190  32   4]]Prediction values:
-[[ 10 238   6   2]]Prediction values:
-[[ 82 140  24  10]]Prediction values:
-[[ 82 146  26   3]]Prediction values:
-[[ 36 196  18   6]]
+Prediction values: [[171  18  52  15]]
+Prediction values:[[228   3  23   1]]
+Prediction values:[[227   7  20   2]]
+Prediction values:[[239   9   5   2]]
+Prediction values:[[129  34  89   4]]
+Prediction values:[[199   7  45   5]]
+Prediction values:[[202  42   9   3]]
+Prediction values:[[189  14  50   2]]
+Prediction values:[[205  11  32   8]]
 
-Prediction values:
-[[ 22  11 221   2]]Prediction values:
-[[ 72   9 171   5]]Prediction values:
-[[ 60   3 192   1]]Prediction values:
-[[ 92  30 128   5]]
+Prediction values:[[ 29 182  23  21]]
+Prediction values:[[ 40 186  22   8]]
+Prediction values:[[ 56 152  42   6]]
+Prediction values:[[ 37 210   6   3]]
+Prediction values:[[ 60 155  36   5]]
+Prediction values:[[ 29 190  32   4]]
+Prediction values:[[ 10 238   6   2]]
+Prediction values:[[ 82 140  24  10]]
+Prediction values:[[ 82 146  26   3]]
+Prediction values:[[ 36 196  18   6]]
+
+Prediction values:[[ 22  11 221   2]]
+Prediction values:[[ 72   9 171   5]]
+Prediction values:[[ 60   3 192   1]]
+Prediction values:[[ 92  30 128   5]]
 
 [[ 22  11 221   2]]Prediction values:
 [[ 72   9 171   5]]Prediction values:
