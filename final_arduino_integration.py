@@ -11,8 +11,6 @@ import os
 
 # ————————————— PIN ASSIGNMENTS —————————————
 # Ultrasonic Sensor GPIO
-#TRIG_PIN   = 23 # Physical: 16
-#ECHO_PIN   = 24 # Physical: 18
 ARDUINO_SIGNAL_PIN = 23  # Physical: 16
 
 # Stepper GPIOs
@@ -111,17 +109,6 @@ def displayChange(val:int):
     current_display = f"{val:04d}"
     display_timeout = time.time() + 60.0
 
-# ————————————— DISTANCE —————————————
-# Pings the ultrasonic sensor to check the distance of the nearest object (cone shaped)
-#def get_distance():
-    #GPIO.output(TRIG_PIN, True)
-    #time.sleep(0.00001)
-    #GPIO.output(TRIG_PIN, False)
-    #start,end = time.time(), time.time()
-    #while GPIO.input(ECHO_PIN)==0: start = time.time()
-    #while GPIO.input(ECHO_PIN)==1: end   = time.time()
-    #return (end-start)*17150
-
 # Captures an image and converts it to UINT8 for the TFLite model
 def capture_image():
     folder = "SortTracks/None" # Change to SortTracks/ClassName to save to that folder, then upload to Git
@@ -188,8 +175,6 @@ GPIO.setwarnings(False)
 
 # Ultrasonic
 GPIO.setup(ARDUINO_SIGNAL_PIN, GPIO.IN)
-#GPIO.setup(TRIG_PIN, GPIO.OUT)
-#GPIO.setup(ECHO_PIN, GPIO.IN)
 
 # Steppers + LED GPIO setup
 for p in (STEP_PIN,DIR_PIN,ENA_PIN, STEP_PIN_2,DIR_PIN_2,ENA_PIN_2, STEP_PIN_3,DIR_PIN_3,ENA_PIN_3, LED_PIN):
@@ -222,9 +207,6 @@ try:
     while True:
         ARDUINO_SIGNAL_PIN = 23  # Physical: 16
         print("Waiting for object detection signal from Arduino...")
-        
-        #dist = get_distance()
-        #print(f"Distance: {dist:.2f} cm")
 
         if GPIO.input(ARDUINO_SIGNAL_PIN) == GPIO.HIGH:
             print("Object detected! Capturing image...")
