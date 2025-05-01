@@ -20,11 +20,14 @@ def measure_distance():
     time.sleep(0.00001)  # 10µs pulse
     GPIO.output(TRIG, GPIO.LOW)
 
+    print("HEre")
     # Wait for Echo to go HIGH (start of pulse)
     start_time = time.time()
     while GPIO.input(ECHO) == 0:
+        print("JGAHCVGJHSFC")
         start_time = time.time()
 
+    print("HerE")
     # Wait for Echo to go LOW (end of pulse)
     end_time = time.time()
     while GPIO.input(ECHO) == 1:
@@ -34,11 +37,14 @@ def measure_distance():
     duration = end_time - start_time
     distance = (duration * 34300) / 2
 
+    print("Here")
     return round(distance, 2)
 
 try:
     while True:
+        print("here")
         distance = measure_distance()
+        print("he")
         print(f"Distance: {distance} cm")
         time.sleep(1)  # Delay before next reading
 
