@@ -111,7 +111,7 @@ def displayChange(val:int):
 
 # Captures an image and converts it to UINT8 for the TFLite model
 def capture_image():
-    folder = "SortTracks/None" # Change to SortTracks/ClassName to save to that folder, then upload to Git
+    folder = "SortTracks/Plastic" # Change to SortTracks/ClassName to save to that folder, then upload to Git
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     image_large = f"image_{timestamp}_large.jpg"
 
