@@ -223,8 +223,8 @@ try:
         ARDUINO_SIGNAL_PIN = 23  # Physical: 16
         print("Waiting for object detection signal from Arduino...")
         
-        dist = get_distance()
-        print(f"Distance: {dist:.2f} cm")
+        #dist = get_distance()
+        #print(f"Distance: {dist:.2f} cm")
 
         if GPIO.input(ARDUINO_SIGNAL_PIN) == GPIO.HIGH:
             print("Object detected! Capturing image...")
