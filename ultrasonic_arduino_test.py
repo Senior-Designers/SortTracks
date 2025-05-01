@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 import time
 
 # GPIO setup
-ARDUINO_SIGNAL_PIN = 23  # Physical: 16)
+ARDUINO_SIGNAL_PIN = 23  # Physical: 16
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(ARDUINO_SIGNAL_PIN, GPIO.IN)
 
