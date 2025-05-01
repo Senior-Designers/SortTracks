@@ -113,14 +113,14 @@ def displayChange(val:int):
 
 # ————————————— DISTANCE —————————————
 # Pings the ultrasonic sensor to check the distance of the nearest object (cone shaped)
-def get_distance():
-    GPIO.output(TRIG_PIN, True)
-    time.sleep(0.00001)
-    GPIO.output(TRIG_PIN, False)
-    start,end = time.time(), time.time()
-    while GPIO.input(ECHO_PIN)==0: start = time.time()
-    while GPIO.input(ECHO_PIN)==1: end   = time.time()
-    return (end-start)*17150
+#def get_distance():
+    #GPIO.output(TRIG_PIN, True)
+    #time.sleep(0.00001)
+    #GPIO.output(TRIG_PIN, False)
+    #start,end = time.time(), time.time()
+    #while GPIO.input(ECHO_PIN)==0: start = time.time()
+    #while GPIO.input(ECHO_PIN)==1: end   = time.time()
+    #return (end-start)*17150
 
 # Captures an image and converts it to UINT8 for the TFLite model
 def capture_image():
