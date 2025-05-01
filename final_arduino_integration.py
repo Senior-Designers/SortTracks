@@ -111,7 +111,7 @@ def displayChange(val:int):
 
 # Captures an image and converts it to UINT8 for the TFLite model
 def capture_image():
-    folder = "SortTracks/Aluminum" # Change to SortTracks/ClassName to save to that folder, then upload to Git
+    folder = "SortTracks/Glass" # Change to SortTracks/ClassName to save to that folder, then upload to Git
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     image_large = f"image_{timestamp}_large.jpg"
 
@@ -235,20 +235,20 @@ try:
 
                 rotate_stepper_motor_1(1600, GPIO.LOW) # Aluminum -> push right = 180 clockwise (top motor)
                 time.sleep(0.5)
-                rotate_stepper_motors_2_3(1600, GPIO.HIGH) # Aluminum -> push left = 180 counterclockwise (lower right motor)
+                rotate_stepper_motors_2_3(1600, GPIO.LOW) # Glass -> push right = 180 clockwise (lower right motor)
 
-                rotate_stepper_motor_1(1600, GPIO.HIGH) # Reset 180 counterclockwise (top motor)
-                rotate_stepper_motors_2_3(1600, GPIO.HIGH) # Reset 180 clockwise (lower right motor)
+                rotate_stepper_motor_1(1600, GPIO.LOW) # Reset 180 clockwise (top motor)
+                rotate_stepper_motors_2_3(1600, GPIO.LOW) # Glass -> push right = 180 clockwise (lower right motor)
             elif prediction == 2: # Glass
                 payout_value = (payout_value + glass_value) % 10000 # Add return value and display on 7-Segment
                 displayChange(payout_value)
                 print("Sorting: Glass")
                 rotate_stepper_motor_1(1600, GPIO.LOW) # Glass -> push right = 180 clockwise (top motor)
                 time.sleep(0.5)
-                rotate_stepper_motors_2_3(1600, GPIO.LOW) # Glass -> push right = 180 clockwise (lower right motor)
+                rotate_stepper_motors_2_3(1600, GPIO.HIGH) # Aluminum -> push left = 180 counterclockwise (lower right motor)
 
                 rotate_stepper_motor_1(1600, GPIO.LOW) # Reset 180 clockwise (top motor)
-                rotate_stepper_motors_2_3(1600, GPIO.LOW) # Reset 180 clockwise (lower right motor)
+                rotate_stepper_motors_2_3(1600, GPIO.HIGH) # Reset 180 counterclockwise (lower right motor)
             elif prediction == 3: # None
                 payout_value = (payout_value + none_value) % 10000 # Add return value and display on 7-Segment
                 displayChange(payout_value)
