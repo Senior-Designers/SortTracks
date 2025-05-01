@@ -9,6 +9,10 @@ import tflite_runtime.interpreter as tflite
 from datetime import datetime
 import os
 
+# 9/10 aluminum
+# 10/10 plastic
+# 10/10 glass
+
 # ————————————— PIN ASSIGNMENTS —————————————
 # Ultrasonic Sensor GPIO
 ARDUINO_SIGNAL_PIN = 23  # Physical: 16
@@ -111,7 +115,7 @@ def displayChange(val:int):
 
 # Captures an image and converts it to UINT8 for the TFLite model
 def capture_image():
-    folder = "SortTracks/Glass" # Change to SortTracks/ClassName to save to that folder, then upload to Git
+    folder = "SortTracks/Testing" # Change to SortTracks/ClassName to save to that folder, then upload to Git
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     image_large = f"image_{timestamp}_large.jpg"
 
@@ -144,10 +148,14 @@ def classify_image(image):
     confidence = np.max(output_data)
     predicted_class = np.argmax(output_data)
 
-    print(f"Prediction values:\n{output_data}")
+    log_message = f"Prediction values:\n{output_data}"
+    print(log_message)
+
+    #with open("SortTracks/log.txt", "a") as f:
+        #f.write(log_message)
     
-    if confidence < 63.75:
-        predicted_class = 3 # Confidence too low (below 25%), select none
+    if confidence < 40:
+        predicted_class = 3 # Confidence too low (below 15.6%), select None
     return predicted_class
 
 # ————————————— STEPPERS —————————————
@@ -197,7 +205,7 @@ picam2 = Picamera2()
 picam2.configure(picam2.create_still_configuration(main={"size":(224,224)}))
 picam2.start()
 
-interpreter = tflite.Interpreter(model_path="model.tflite")
+interpreter = tflite.Interpreter(model_path="SortTracks/model2.tflite")
 interpreter.allocate_tensors()
 inp = interpreter.get_input_details()[0]['index']
 out = interpreter.get_output_details()[0]['index']
