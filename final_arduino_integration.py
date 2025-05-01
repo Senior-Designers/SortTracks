@@ -264,7 +264,7 @@ try:
             time.sleep(1)
         else:
             print("No signal yet")
-        time.sleep(0.1)
+        time.sleep(0.05)
 
 except KeyboardInterrupt: # Shutdown
     GPIO.output(ENA_PIN,   GPIO.LOW)
