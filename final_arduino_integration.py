@@ -230,9 +230,12 @@ try:
                 payout_value = (payout_value + plastic_value) % 10000 # Add return value and display on 7-Segment
                 displayChange(payout_value)
                 print("Sorting: Plastic")
+
                 rotate_stepper_motor_1(1600, GPIO.HIGH) # Plastic -> push left = 180 counterclockwise (top motor)
                 time.sleep(0.5)
-                rotate_stepper_motors_2_3(1600, GPIO.LOW) # Plastic -> push right = 180 clockwise (both motor)
+
+                rotate_stepper_motors_2_3(500, GPIO.HIGH) # Reverse tilt to account for possible stuck bottle
+                rotate_stepper_motors_2_3(2100, GPIO.LOW) # Plastic -> push right = 180 + (reverse tilt corrcetion) clockwise (both motor)
 
                 rotate_stepper_motor_1(1600, GPIO.HIGH) # Reset 180 counterclockwise (top motor)
                 rotate_stepper_motors_2_3(1600, GPIO.LOW) # Reset 180 clockwise (lower left motor)
